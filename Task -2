@@ -1,0 +1,81 @@
+import nmap
+import requests
+
+def scan_open_ports(target):
+    nm = nmap.PortScanner()
+    nm.scan(target, '1-1024')  # Scan ports 1 to 1024
+    open_ports = []
+    for host in nm.all_hosts():
+        for proto in nm[host].all_protocols():
+            lport = nm[host][proto].keys()
+            for port in lport:
+                if nm[host][proto][port]['state'] == 'open':
+                    open_ports.append(port)
+    return open_ports
+
+def check_http_headers(target):
+    try:
+        response = requests.get(target)
+        headers = response.headers
+        outdated = False
+        feedback = []
+
+        # Example check: Server version disclosure
+        if 'Server' in headers:
+            server_info = headers['Server']
+            if 'nginx' in server_info or 'Apache' in server_info:
+                version_info = server_info.split('/')
+                if len(version_info) > 1:
+                    version = version_info[1]
+                    feedback.append(f"Server software: {server_info}")
+                    # Placeholder for checking outdated versions
+                    # This can be replaced with actual version comparison logic
+                    outdated = True
+
+        return outdated, feedback
+    except requests.RequestException as e:
+        return False, [f"Error accessing {target}: {e}"]
+
+def check_ssl(target):
+    try:
+        response = requests.get(target)
+        if response.url.startswith("https://"):
+            return True, ["SSL/TLS is enabled."]
+        else:
+            return False, ["SSL/TLS is not enabled."]
+    except requests.RequestException as e:
+        return False, [f"Error accessing {target}: {e}"]
+
+def scan_vulnerabilities(target):
+    results = {
+        'open_ports': [],
+        'http_headers': [],
+        'ssl': []
+    }
+
+    # Scan open ports
+    open_ports = scan_open_ports(target)
+    results['open_ports'] = open_ports
+
+    # Check HTTP headers
+    if not target.startswith('http://') and not target.startswith('https://'):
+        target = 'http://' + target
+    outdated, headers_feedback = check_http_headers(target)
+    results['http_headers'] = headers_feedback
+
+    # Check for SSL
+    ssl_enabled, ssl_feedback = check_ssl(target)
+    results['ssl'] = ssl_feedback
+
+    return results
+
+# Example usage
+target = "example.com"
+vulnerabilities = scan_vulnerabilities(target)
+print(f"Open Ports: {vulnerabilities['open_ports']}")
+print("HTTP Headers Feedback:")
+for item in vulnerabilities['http_headers']:
+    print(f" - {item}")
+print("SSL Feedback:")
+for item in vulnerabilities['ssl']:
+    print(f" - {item}")
