@@ -1,11 +1,11 @@
 # CODTECH-TASK-2
 
-Project name :- vulnerability scanning tool
-Name :- Mekala Hemanth
-Company :- CODTECH IT SOLUTIONS 
-ID :- CT08PD775 Domain :- Cyber Security & Ethical Hacking
-Duration :- May to june 2024 
-Mentor :- SRAVANI GOUNI
+      Project name :- vulnerability scanning tool
+      Name :- Mekala Hemanth
+      Company :- CODTECH IT SOLUTIONS 
+      ID :- CT08PD775 Domain :- Cyber Security & Ethical Hacking
+      Duration :- May to june 2024 
+      Mentor :- SRAVANI GOUNI
 
 Creating a simple vulnerability scanning tool involves checking for common security issues like open ports, outdated software versions, and misconfigurations. For this implementation, we'll use Python with libraries such as socket, nmap, and requests.
 
